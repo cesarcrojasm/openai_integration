@@ -6,6 +6,8 @@ from app.services.drive_service import upload_file_to_drive
 from app.services.sheets_service import append_row_to_sheet
 from datetime import datetime
 import pytz
+
+
 app = FastAPI()
 
 @app.get("/")
@@ -46,8 +48,7 @@ async def twilio_webhook(request: Request):
         timestamp = datetime.now(tz).strftime('%Y-%m-%d %H:%M:%S')
 
         # ID de tu Google Sheet
-        #spreadsheet_id = settings.GOOGLE_SHEETS_ID
-        spreadsheet_id = "1Xfo9yXEuMvtIMgdlsiNzp5UhQWry9GFWtImmAMKBKOk"
+        spreadsheet_id = settings.GOOGLE_SHEETS_ID
         print(f"Spreadsheet ID: {spreadsheet_id}")
         # Datos a guardar (si no hay imagen, webViewLink será "")
         values = [from_number, webViewLink, timestamp, message_body]
