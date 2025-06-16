@@ -1,6 +1,8 @@
+import os
 from fastapi import FastAPI, Request
 from app.config import settings
-
+import requests
+from app.services.drive_service import upload_file_to_drive
 app = FastAPI()
 
 @app.get("/")
@@ -11,4 +13,28 @@ def read_root():
 @app.post("/webhook/twilio")
 async def twilio_webhook(request: Request):
     form = await request.form()
-    return {"status": "ok", "data": dict(form)} 
+    from_number = form.get("From")
+    message_body = form.get("Body")
+    num_media = int(form.get("NumMedia", 0))
+
+    print(f"Mensaje recibido de {from_number}: {message_body}")
+
+    if num_media > 0:
+        media_url = form.get("MediaUrl0")
+        media_type = form.get("MediaContentType0")
+        print(f"Imagen recibida: {media_url} (tipo: {media_type})")
+
+        # Crea la carpeta 'images' si no existe
+        os.makedirs("images", exist_ok=True)
+        extension = media_type.split("/")[-1]
+        filename = f"images/imagen_{from_number.replace(':', '_')}.{extension}"
+
+        # Descarga y guarda la imagen
+        response = requests.get(media_url)
+        with open(filename, "wb") as f:
+            f.write(response.content)
+        print(f"Imagen guardada como {filename}")
+
+        file_id, webViewLink = upload_file_to_drive(filename, os.path.basename(filename), folder_id="1ba3-RuKdhKBXnHeOfDcPyeqmPZzhEVOA")
+        print(f"Enlace de la imagen en Google Drive: {webViewLink}")
+    return "OK" 
