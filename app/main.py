@@ -41,18 +41,18 @@ async def twilio_webhook(request: Request):
         file_id, webViewLink = upload_file_to_drive(filename, os.path.basename(filename), folder_id="1ba3-RuKdhKBXnHeOfDcPyeqmPZzhEVOA")
         print(f"Enlace de la imagen en Google Drive: {webViewLink}")
 
-      # Obtén el timestamp en horario America/Bogota
+        # Obtén el timestamp en horario America/Bogota
         tz = pytz.timezone('America/Bogota')
         timestamp = datetime.now(tz).strftime('%Y-%m-%d %H:%M:%S')
 
         # ID de tu Google Sheet
-        spreadsheet_id = settings.GOOGLE_SHEETS_ID
+        #spreadsheet_id = settings.GOOGLE_SHEETS_ID
         spreadsheet_id = "1Xfo9yXEuMvtIMgdlsiNzp5UhQWry9GFWtImmAMKBKOk"
         print(f"Spreadsheet ID: {spreadsheet_id}")
-        # Datos a guardar
-        values = [from_number, webViewLink, timestamp]
+        # Datos a guardar (si no hay imagen, webViewLink será "")
+        values = [from_number, webViewLink, timestamp, message_body]
 
         # Guarda en Google Sheets
         append_row_to_sheet(spreadsheet_id, values)
         print("Datos guardados en Google Sheets")      
-    return "OK" 
+        return "OK" 
